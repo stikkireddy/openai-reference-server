@@ -21,8 +21,10 @@ class ErrorResponse(OpenAIBaseModel):
     param: Optional[str] = None
     code: int
 
+
 def random_uuid() -> str:
     return str(uuid.uuid4().hex)
+
 
 class ModelPermission(OpenAIBaseModel):
     id: str = Field(default_factory=lambda: f"modelperm-{random_uuid()}")
@@ -95,7 +97,7 @@ class ChatCompletionRequest(OpenAIBaseModel):
     # Ordered by official OpenAI API documentation
     # https://platform.openai.com/docs/api-reference/chat/create
     messages: List[ChatCompletionMessageParam]
-    model: Optional[str] = None # azure openai doesnt need this as its part of the url
+    model: Optional[str] = None  # azure openai doesnt need this as its part of the url
     frequency_penalty: Optional[float] = 0.0
     logit_bias: Optional[Dict[str, float]] = None
     logprobs: Optional[bool] = False
@@ -104,18 +106,20 @@ class ChatCompletionRequest(OpenAIBaseModel):
     n: Optional[int] = 1
     presence_penalty: Optional[float] = 0.0
     response_format: Optional[ResponseFormat] = None
-    seed: Optional[int] = Field(None,
-                                # ge=torch.iinfo(torch.long).min, #todo maybe
-                                # le=torch.iinfo(torch.long).max
-                                )
+    seed: Optional[int] = Field(
+        None,
+        # ge=torch.iinfo(torch.long).min, #todo maybe
+        # le=torch.iinfo(torch.long).max
+    )
     stop: Optional[Union[str, List[str]]] = Field(default_factory=list)
     stream: Optional[bool] = False
     stream_options: Optional[StreamOptions] = None
     temperature: Optional[float] = 0.7
     top_p: Optional[float] = 1.0
     tools: Optional[List[ChatCompletionToolsParam]] = None
-    tool_choice: Optional[Union[Literal["none"],
-                                ChatCompletionNamedToolChoiceParam]] = "none"
+    tool_choice: Optional[
+        Union[Literal["none"], ChatCompletionNamedToolChoiceParam]
+    ] = "none"
     user: Optional[str] = None
 
     # doc: begin-chat-completion-sampling-params
@@ -140,14 +144,16 @@ class ChatCompletionRequest(OpenAIBaseModel):
         default=False,
         description=(
             "If true, the new message will be prepended with the last message "
-            "if they belong to the same role."),
+            "if they belong to the same role."
+        ),
     )
     add_generation_prompt: bool = Field(
         default=True,
-        description=
-        ("If true, the generation prompt will be added to the chat template. "
-         "This is a parameter used by chat template in tokenizer config of the "
-         "model."),
+        description=(
+            "If true, the generation prompt will be added to the chat template. "
+            "This is a parameter used by chat template in tokenizer config of the "
+            "model."
+        ),
     )
     add_special_tokens: bool = Field(
         default=False,
@@ -156,28 +162,33 @@ class ChatCompletionRequest(OpenAIBaseModel):
             "on top of what is added by the chat template. "
             "For most models, the chat template takes care of adding the "
             "special tokens so this should be set to false (as is the "
-            "default)."),
+            "default)."
+        ),
     )
     documents: Optional[List[Dict[str, str]]] = Field(
         default=None,
-        description=
-        ("A list of dicts representing documents that will be accessible to "
-         "the model if it is performing RAG (retrieval-augmented generation)."
-         " If the template does not support RAG, this argument will have no "
-         "effect. We recommend that each document should be a dict containing "
-         "\"title\" and \"text\" keys."),
+        description=(
+            "A list of dicts representing documents that will be accessible to "
+            "the model if it is performing RAG (retrieval-augmented generation)."
+            " If the template does not support RAG, this argument will have no "
+            "effect. We recommend that each document should be a dict containing "
+            '"title" and "text" keys.'
+        ),
     )
     chat_template: Optional[str] = Field(
         default=None,
         description=(
             "A Jinja template to use for this conversion. "
             "If this is not passed, the model's default chat template will be "
-            "used instead."),
+            "used instead."
+        ),
     )
     chat_template_kwargs: Optional[Dict[str, Any]] = Field(
         default=None,
-        description=("Additional kwargs to pass to the template renderer. "
-                     "Will be accessible by the chat template."),
+        description=(
+            "Additional kwargs to pass to the template renderer. "
+            "Will be accessible by the chat template."
+        ),
     )
     guided_json: Optional[Union[str, dict, BaseModel]] = Field(
         default=None,
@@ -185,60 +196,62 @@ class ChatCompletionRequest(OpenAIBaseModel):
     )
     guided_regex: Optional[str] = Field(
         default=None,
-        description=(
-            "If specified, the output will follow the regex pattern."),
+        description=("If specified, the output will follow the regex pattern."),
     )
     guided_choice: Optional[List[str]] = Field(
         default=None,
-        description=(
-            "If specified, the output will be exactly one of the choices."),
+        description=("If specified, the output will be exactly one of the choices."),
     )
     guided_grammar: Optional[str] = Field(
         default=None,
-        description=(
-            "If specified, the output will follow the context free grammar."),
+        description=("If specified, the output will follow the context free grammar."),
     )
     guided_decoding_backend: Optional[str] = Field(
         default=None,
         description=(
             "If specified, will override the default guided decoding backend "
             "of the server for this specific request. If set, must be either "
-            "'outlines' / 'lm-format-enforcer'"))
+            "'outlines' / 'lm-format-enforcer'"
+        ),
+    )
     guided_whitespace_pattern: Optional[str] = Field(
         default=None,
         description=(
             "If specified, will override the default whitespace pattern "
-            "for guided json decoding."))
+            "for guided json decoding."
+        ),
+    )
 
     # doc: end-chat-completion-extra-params
 
-    @model_validator(mode='before')
+    @model_validator(mode="before")
     @classmethod
     def validate_stream_options(cls, values):
-        if (values.get('stream_options') is not None
-                and not values.get('stream')):
-            raise ValueError(
-                "stream_options can only be set if stream is true")
+        if values.get("stream_options") is not None and not values.get("stream"):
+            raise ValueError("stream_options can only be set if stream is true")
         return values
 
     @model_validator(mode="before")
     @classmethod
     def check_guided_decoding_count(cls, data):
-        guide_count = sum([
-            "guided_json" in data and data["guided_json"] is not None,
-            "guided_regex" in data and data["guided_regex"] is not None,
-            "guided_choice" in data and data["guided_choice"] is not None
-        ])
+        guide_count = sum(
+            [
+                "guided_json" in data and data["guided_json"] is not None,
+                "guided_regex" in data and data["guided_regex"] is not None,
+                "guided_choice" in data and data["guided_choice"] is not None,
+            ]
+        )
         # you can only use one kind of guided decoding
         if guide_count > 1:
             raise ValueError(
                 "You can only use one kind of guided decoding "
-                "('guided_json', 'guided_regex' or 'guided_choice').")
+                "('guided_json', 'guided_regex' or 'guided_choice')."
+            )
         # you can only either use guided decoding or tools, not both
-        if guide_count > 1 and "tool_choice" in data and data[
-                "tool_choice"] != "none":
+        if guide_count > 1 and "tool_choice" in data and data["tool_choice"] != "none":
             raise ValueError(
-                "You can only either use guided decoding or tools, not both.")
+                "You can only either use guided decoding or tools, not both."
+            )
         return data
 
     @model_validator(mode="before")
@@ -248,8 +261,7 @@ class ChatCompletionRequest(OpenAIBaseModel):
             if not isinstance(data["tool_choice"], dict):
                 raise ValueError("Currently only named tools are supported.")
             if "tools" not in data or data["tools"] is None:
-                raise ValueError(
-                    "When using `tool_choice`, `tools` must be set.")
+                raise ValueError("When using `tool_choice`, `tools` must be set.")
         return data
 
     @model_validator(mode="before")
@@ -261,8 +273,7 @@ class ChatCompletionRequest(OpenAIBaseModel):
                     "when using `top_logprobs`, `logprobs` must be set to true."
                 )
             elif data["top_logprobs"] < 0:
-                raise ValueError(
-                    "`top_logprobs` must be a value a positive value.")
+                raise ValueError("`top_logprobs` must be a value a positive value.")
         return data
 
 
@@ -279,10 +290,11 @@ class CompletionRequest(OpenAIBaseModel):
     max_tokens: Optional[int] = 16
     n: int = 1
     presence_penalty: Optional[float] = 0.0
-    seed: Optional[int] = Field(None,
-                                # ge=torch.iinfo(torch.long).min,
-                                # le=torch.iinfo(torch.long).max # todo: maybe
-                                )
+    seed: Optional[int] = Field(
+        None,
+        # ge=torch.iinfo(torch.long).min,
+        # le=torch.iinfo(torch.long).max # todo: maybe
+    )
     stop: Optional[Union[str, List[str]]] = Field(default_factory=list)
     stream: Optional[bool] = False
     stream_options: Optional[StreamOptions] = None
@@ -313,14 +325,16 @@ class CompletionRequest(OpenAIBaseModel):
         default=True,
         description=(
             "If true (the default), special tokens (e.g. BOS) will be added to "
-            "the prompt."),
+            "the prompt."
+        ),
     )
     response_format: Optional[ResponseFormat] = Field(
         default=None,
-        description=
-        ("Similar to chat completion, this parameter specifies the format of "
-         "output. Only {'type': 'json_object'} or {'type': 'text' } is "
-         "supported."),
+        description=(
+            "Similar to chat completion, this parameter specifies the format of "
+            "output. Only {'type': 'json_object'} or {'type': 'text' } is "
+            "supported."
+        ),
     )
     guided_json: Optional[Union[str, dict, BaseModel]] = Field(
         default=None,
@@ -328,52 +342,59 @@ class CompletionRequest(OpenAIBaseModel):
     )
     guided_regex: Optional[str] = Field(
         default=None,
-        description=(
-            "If specified, the output will follow the regex pattern."),
+        description=("If specified, the output will follow the regex pattern."),
     )
     guided_choice: Optional[List[str]] = Field(
         default=None,
-        description=(
-            "If specified, the output will be exactly one of the choices."),
+        description=("If specified, the output will be exactly one of the choices."),
     )
     guided_grammar: Optional[str] = Field(
         default=None,
-        description=(
-            "If specified, the output will follow the context free grammar."),
+        description=("If specified, the output will follow the context free grammar."),
     )
     guided_decoding_backend: Optional[str] = Field(
         default=None,
         description=(
             "If specified, will override the default guided decoding backend "
             "of the server for this specific request. If set, must be one of "
-            "'outlines' / 'lm-format-enforcer'"))
+            "'outlines' / 'lm-format-enforcer'"
+        ),
+    )
     guided_whitespace_pattern: Optional[str] = Field(
         default=None,
         description=(
             "If specified, will override the default whitespace pattern "
-            "for guided json decoding."))
+            "for guided json decoding."
+        ),
+    )
 
     # doc: end-completion-extra-params
 
     @model_validator(mode="before")
     @classmethod
     def check_guided_decoding_count(cls, data):
-        guide_count = sum([
-            "guided_json" in data and data["guided_json"] is not None,
-            "guided_regex" in data and data["guided_regex"] is not None,
-            "guided_choice" in data and data["guided_choice"] is not None
-        ])
+        guide_count = sum(
+            [
+                "guided_json" in data and data["guided_json"] is not None,
+                "guided_regex" in data and data["guided_regex"] is not None,
+                "guided_choice" in data and data["guided_choice"] is not None,
+            ]
+        )
         if guide_count > 1:
             raise ValueError(
                 "You can only use one kind of guided decoding "
-                "('guided_json', 'guided_regex' or 'guided_choice').")
+                "('guided_json', 'guided_regex' or 'guided_choice')."
+            )
         return data
 
     @model_validator(mode="before")
     @classmethod
     def check_logprobs(cls, data):
-        if "logprobs" in data and data[
-                "logprobs"] is not None and not data["logprobs"] >= 0:
+        if (
+            "logprobs" in data
+            and data["logprobs"] is not None
+            and not data["logprobs"] >= 0
+        ):
             raise ValueError("if passed, `logprobs` must be a positive value.")
         return data
 
@@ -381,8 +402,7 @@ class CompletionRequest(OpenAIBaseModel):
     @classmethod
     def validate_stream_options(cls, data):
         if data.get("stream_options") and not data.get("stream"):
-            raise ValueError(
-                "Stream options can only be defined when stream is true.")
+            raise ValueError("Stream options can only be defined when stream is true.")
         return data
 
 
@@ -391,7 +411,7 @@ class EmbeddingRequest(OpenAIBaseModel):
     # https://platform.openai.com/docs/api-reference/embeddings
     model: str
     input: Union[List[int], List[List[int]], str, List[str]]
-    encoding_format: Optional[str] = Field('float', pattern='^(float|base64)$')
+    encoding_format: Optional[str] = Field("float", pattern="^(float|base64)$")
     dimensions: Optional[int] = None
     user: Optional[str] = None
 
@@ -405,8 +425,7 @@ class CompletionLogProbs(OpenAIBaseModel):
     text_offset: List[int] = Field(default_factory=list)
     token_logprobs: List[Optional[float]] = Field(default_factory=list)
     tokens: List[str] = Field(default_factory=list)
-    top_logprobs: List[Optional[Dict[str,
-                                     float]]] = Field(default_factory=list)
+    top_logprobs: List[Optional[Dict[str, float]]] = Field(default_factory=list)
 
 
 class CompletionResponseChoice(OpenAIBaseModel):
@@ -419,7 +438,8 @@ class CompletionResponseChoice(OpenAIBaseModel):
         description=(
             "The stop string or token id that caused the completion "
             "to stop, None if the completion finished for some other reason "
-            "including encountering the EOS token"),
+            "including encountering the EOS token"
+        ),
     )
 
 
@@ -442,7 +462,8 @@ class CompletionResponseStreamChoice(OpenAIBaseModel):
         description=(
             "The stop string or token id that caused the completion "
             "to stop, None if the completion finished for some other reason "
-            "including encountering the EOS token"),
+            "including encountering the EOS token"
+        ),
     )
 
 

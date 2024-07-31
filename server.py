@@ -1,7 +1,13 @@
 from fastapi import FastAPI, Request, Depends, HTTPException, APIRouter
 from fastapi.security import APIKeyHeader
 
-from protocl import ChatCompletionRequest, ChatCompletionResponse, ChatCompletionResponseChoice, ChatMessage, UsageInfo
+from protocol import (
+    ChatCompletionRequest,
+    ChatCompletionResponse,
+    ChatCompletionResponseChoice,
+    ChatMessage,
+    UsageInfo,
+)
 
 app = FastAPI()
 
@@ -21,8 +27,7 @@ router = APIRouter(dependencies=[Depends(verify_api_key)])
 
 
 @router.post("/{path_name:path}/chat/completions")
-async def create_chat_completion(request: ChatCompletionRequest,
-                                 raw_request: Request):
+async def create_chat_completion(request: ChatCompletionRequest, raw_request: Request):
     print("Received request", request)
     print("Received headers", raw_request.headers)
     return ChatCompletionResponse(
@@ -32,10 +37,12 @@ async def create_chat_completion(request: ChatCompletionRequest,
             prompt_tokens=200,
             total_tokens=300,
         ),
-        choices=[ChatCompletionResponseChoice(
-            message=ChatMessage(content="Hello, world!", role="system"),
-            index=0,
-        )]
+        choices=[
+            ChatCompletionResponseChoice(
+                message=ChatMessage(content="Hello, world!", role="system"),
+                index=0,
+            )
+        ],
     )
 
 
@@ -43,4 +50,5 @@ app.include_router(router)
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
