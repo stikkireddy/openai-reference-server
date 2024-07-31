@@ -15,7 +15,7 @@ import (
 	// WARNING!
 	// Pass --git-repo-id and --git-user-id properties when generating the code
 	//
-	sw "github.com/stikkireddy/example/openapi/go"
+	sw "github.com/stikkireddy/reference-openai-server/openapi/go"
 )
 
 func main() {

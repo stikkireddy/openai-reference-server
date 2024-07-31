@@ -1,4 +1,4 @@
-module github.com/stikkireddy/example/openapi
+module github.com/stikkireddy/reference-openai-server/openapi
 
 go 1.19
 
