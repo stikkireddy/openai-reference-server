@@ -7,6 +7,12 @@ from protocol import (
     ChatCompletionResponseChoice,
     ChatMessage,
     UsageInfo,
+    EmbeddingRequest,
+    EmbeddingResponse,
+    EmbeddingResponseData,
+    CompletionRequest,
+    CompletionResponse,
+    CompletionResponseChoice,
 )
 
 app = FastAPI()
@@ -40,6 +46,41 @@ async def create_chat_completion(request: ChatCompletionRequest, raw_request: Re
         choices=[
             ChatCompletionResponseChoice(
                 message=ChatMessage(content="Hello, world!", role="system"),
+                index=0,
+            )
+        ],
+    )
+
+
+@router.post("/{path_name:path}/embeddings")
+async def create_embedding(request: EmbeddingRequest, raw_request: Request):
+    print("Received request", request)
+    print("Received headers", raw_request.headers)
+    return EmbeddingResponse(
+        model="some-model",
+        usage=UsageInfo(
+            completion_tokens=100,
+            prompt_tokens=200,
+            total_tokens=300,
+        ),
+        data=[EmbeddingResponseData(embedding=[0.1, 0.2, 0.3], index=0)],
+    )
+
+
+@router.post("/{path_name:path}/completions")
+async def create_completion(request: CompletionRequest, raw_request: Request):
+    print("Received request", request)
+    print("Received headers", raw_request.headers)
+    return CompletionResponse(
+        model="some-model",
+        usage=UsageInfo(
+            completion_tokens=100,
+            prompt_tokens=200,
+            total_tokens=300,
+        ),
+        choices=[
+            CompletionResponseChoice(
+                text="Hello, world!",
                 index=0,
             )
         ],

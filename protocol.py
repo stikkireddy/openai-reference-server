@@ -280,8 +280,8 @@ class ChatCompletionRequest(OpenAIBaseModel):
 class CompletionRequest(OpenAIBaseModel):
     # Ordered by official OpenAI API documentation
     # https://platform.openai.com/docs/api-reference/completions/create
-    model: str
     prompt: Union[List[int], List[List[int]], str, List[str]]
+    model: Optional[str] = None  # azure openai sends this as part of the path
     best_of: Optional[int] = None
     echo: Optional[bool] = False
     frequency_penalty: Optional[float] = 0.0
@@ -409,9 +409,9 @@ class CompletionRequest(OpenAIBaseModel):
 class EmbeddingRequest(OpenAIBaseModel):
     # Ordered by official OpenAI API documentation
     # https://platform.openai.com/docs/api-reference/embeddings
-    model: str
     input: Union[List[int], List[List[int]], str, List[str]]
     encoding_format: Optional[str] = Field("float", pattern="^(float|base64)$")
+    model: Optional[str] = None
     dimensions: Optional[int] = None
     user: Optional[str] = None
 
