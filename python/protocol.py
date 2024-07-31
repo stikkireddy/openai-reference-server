@@ -410,7 +410,7 @@ class EmbeddingRequest(OpenAIBaseModel):
     # Ordered by official OpenAI API documentation
     # https://platform.openai.com/docs/api-reference/embeddings
     input: Union[List[int], List[List[int]], str, List[str]]
-    encoding_format: Optional[str] = Field("float", pattern="^(float|base64)$")
+    encoding_format: str = Field("float", pattern="^(float|base64)$")
     model: Optional[str] = None
     dimensions: Optional[int] = None
     user: Optional[str] = None

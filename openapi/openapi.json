@@ -1426,15 +1426,8 @@
                         "title": "Input"
                     },
                     "encoding_format": {
-                        "anyOf": [
-                            {
-                                "type": "string",
-                                "pattern": "^(float|base64)$"
-                            },
-                            {
-                                "type": "null"
-                            }
-                        ],
+                        "type": "string",
+                        "pattern": "^(float|base64)$",
                         "title": "Encoding Format",
                         "default": "float"
                     },
