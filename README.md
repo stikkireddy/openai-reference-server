@@ -11,3 +11,6 @@ If you want to quickly test this you can use a service like ngrok and integrate 
 Feel free to contribute to embeddings, completions, multi modal, etc.
 
 This is setup to run on databricks ai gateway with configuration to run on azure openai with custom base path.
+
+We used vllm stub implementation build a FastAPI app and then generate the swagger spec based on the models. 
+Then we can code generate for other languages such as golang, nodejs, etc.

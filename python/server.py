@@ -32,10 +32,11 @@ def verify_api_key(api_key: str = Depends(api_key_header)):
 router = APIRouter(dependencies=[Depends(verify_api_key)])
 
 
-@router.post("/{path_name:path}/chat/completions")
-async def create_chat_completion(request: ChatCompletionRequest, raw_request: Request):
+@router.post("/openai/deployments/{deployment_name:path}/chat/completions")
+async def create_chat_completion(request: ChatCompletionRequest, raw_request: Request, deployment_name: str):
     print("Received request", request)
     print("Received headers", raw_request.headers)
+    print("Received path_name", deployment_name)
     return ChatCompletionResponse(
         model="some-model",
         usage=UsageInfo(
@@ -52,10 +53,11 @@ async def create_chat_completion(request: ChatCompletionRequest, raw_request: Re
     )
 
 
-@router.post("/{path_name:path}/embeddings")
-async def create_embedding(request: EmbeddingRequest, raw_request: Request):
+@router.post("/openai/deployments/{deployment_name:path}/embeddings")
+async def create_embedding(request: EmbeddingRequest, raw_request: Request, deployment_name: str):
     print("Received request", request)
     print("Received headers", raw_request.headers)
+    print("Received path_name", deployment_name)
     return EmbeddingResponse(
         model="some-model",
         usage=UsageInfo(
@@ -67,10 +69,11 @@ async def create_embedding(request: EmbeddingRequest, raw_request: Request):
     )
 
 
-@router.post("/{path_name:path}/completions")
-async def create_completion(request: CompletionRequest, raw_request: Request):
+@router.post("/openai/deployments/{deployment_name:path}/completions")
+async def create_completion(request: CompletionRequest, raw_request: Request, deployment_name: str):
     print("Received request", request)
     print("Received headers", raw_request.headers)
+    print("Received path_name", deployment_name)
     return CompletionResponse(
         model="some-model",
         usage=UsageInfo(

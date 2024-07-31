@@ -1,13 +1,8 @@
-# Define the directory containing your Python code
-SRC_DIR := .
+gen-go:
+	openapi-generator generate -i openapi/openapi.json -g go-gin-server -o golang-gin --additional-properties=isGoSubmodule=true --git-repo-id="example" --git-user-id="stikkireddy"
 
-dev:
-	pip install -r dev-requirements.txt
+run-go:
+	cd golang-gin && go mod tidy && go run main.go
 
-# Define the command to format Python code
-fmt: dev
-	black $(SRC_DIR)
-
-
-run:
-	python server.py
+run-python:
+	cd python && make run

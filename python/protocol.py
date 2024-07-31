@@ -416,7 +416,7 @@ class EmbeddingRequest(OpenAIBaseModel):
     user: Optional[str] = None
 
     # doc: begin-embedding-pooling-params
-    additional_data: Optional[Any] = None
+    # additional_data: Optional[Any] = None # not needed for aoi spec
 
     # doc: end-embedding-pooling-params
 
